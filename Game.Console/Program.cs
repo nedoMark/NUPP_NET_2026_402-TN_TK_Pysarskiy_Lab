@@ -1,77 +1,22 @@
-﻿using Game;
+using System.Text;
+using Game;
 
-// Створюємо CRUD-сервіс
-CharacterService service = new CharacterService();
-
-// Створюємо персонажів
-Character hero = new Character("Hero", 100);
-Character enemy = new Character("Goblin", 50);
-
-// CREATE
-service.Create(hero);
-service.Create(enemy);
-
-Console.WriteLine("=== CREATE ===");
-Console.WriteLine($"Створено: {hero.Name}");
-Console.WriteLine($"Створено: {enemy.Name}");
-
-// READ
-Console.WriteLine("\n=== READ ===");
-Character found = service.Read(hero.Id);
-
-if (found != null)
-{
-    Console.WriteLine($"Знайдено: {found.Name}, HP: {found.Health}");
-}
-
-// READ ALL
-Console.WriteLine("\n=== READ ALL ===");
-
-foreach (Character character in service.ReadAll())
-{
-    Console.WriteLine($"{character.Name}, HP: {character.Health}");
-}
-
-// UPDATE
-Console.WriteLine("\n=== UPDATE ===");
-
-hero.Health = 80;
-service.Update(hero);
-
-Console.WriteLine($"Після оновлення: {hero.Name}, HP: {hero.Health}");
-
-// REMOVE
-Console.WriteLine("\n=== REMOVE ===");
-
-service.Remove(enemy);
-
-Console.WriteLine($"Видалено: {enemy.Name}");
-
-Console.WriteLine("\nЗалишилися персонажі:");
-
-foreach (Character character in service.ReadAll())
-{
-    Console.WriteLine($"{character.Name}, HP: {character.Health}");
-}
-
-// Extension Method
-Console.WriteLine("\n=== EXTENSION METHOD ===");
-Console.WriteLine(hero.GetInfo());
-
-// Подія Player
-Console.WriteLine("\n=== EVENT ===");
-
-Player player = new Player("Player", 100, "HeroPlayer");
-
-player.LevelChanged += message =>
-{
-    Console.WriteLine(message);
-};
-
-player.AddExperience(100);
-
-// Статичний метод
-Console.WriteLine("\n=== STATIC METHOD ===");
-Console.WriteLine(
-    $"Кількість створених персонажів: {Character.GetCharacterCount()}"
-);
+Console.OutputEncoding = Encoding.UTF8;
+string file = Path.GetFullPath(args.Length > 0 ? args[0] : "characters.json");
+var service = new CrudServiceAsync<Character>(file);
+const int count = 1000;
+Parallel.For(0, count, _ => service.CreateAsync(Character.CreateNew()).GetAwaiter().GetResult());
+var characters = (await service.ReadAllAsync()).ToArray();
+Console.WriteLine("Лабораторна робота №2: асинхронний CRUD і паралельне створення");
+Console.WriteLine($"Створено персонажів: {characters.Length}");
+Console.WriteLine($"Здоров'я: мінімум = {characters.Min(x => x.Health)}, максимум = {characters.Max(x => x.Health)}, середнє = {characters.Average(x => x.Health):F2}");
+Console.WriteLine($"Перша сторінка (по 10): {(await service.ReadAllAsync(1, 10)).Count()} записів");
+Console.WriteLine($"Перебір через IEnumerable: {service.Count()} записів");
+using var completed = new AutoResetEvent(false);
+int signalled = 0;
+var worker = Task.Run(() => { Interlocked.Exchange(ref signalled, 1); completed.Set(); });
+completed.WaitOne();
+await worker;
+Console.WriteLine($"AutoResetEvent: сигнал отримано = {signalled == 1}");
+Console.WriteLine($"Збереження JSON: {await service.SaveAsync()}");
+Console.WriteLine($"Файл: {file}");

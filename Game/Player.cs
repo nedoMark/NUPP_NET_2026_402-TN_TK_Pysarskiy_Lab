@@ -20,6 +20,8 @@ public class Player : Character
         Experience = 0;
     }
 
+    public new static Player CreateNew() => new($"Гравець-{Guid.NewGuid():N}", Random.Shared.Next(50, 201), $"Nick-{Guid.NewGuid():N}") { Level = Random.Shared.Next(1, 51), Experience = Random.Shared.Next(0, 100) };
+
     // Метод, який викликає подію
     public void AddExperience(int amount)
     {

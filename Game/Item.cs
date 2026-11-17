@@ -1,6 +1,6 @@
 namespace Game;
 
-public class Item
+public class Item : IEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
@@ -12,4 +12,6 @@ public class Item
         Name = name;
         Value = value;
     }
+
+    public static Item CreateNew() => new($"Предмет-{Guid.NewGuid():N}", Random.Shared.Next(1, 1001));
 }
