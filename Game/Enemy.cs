@@ -13,4 +13,6 @@ public class Enemy : Character
         Damage = damage;
         Reward = reward;
     }
+
+    public new static Enemy CreateNew() => new($"Ворог-{Guid.NewGuid():N}", Random.Shared.Next(50, 201), "Монстр", Random.Shared.Next(1, 101), Random.Shared.Next(1, 501));
 }

@@ -1,6 +1,6 @@
 namespace Game;
 
-public class Character
+public class Character : IEntity
 {
     // Властивості класу
     public Guid Id { get; set; }
@@ -22,7 +22,7 @@ public class Character
         Id = Guid.NewGuid();
         Name = name;
         Health = health;
-        characterCount++;
+        Interlocked.Increment(ref characterCount);
     }
 
     // Метод
@@ -39,6 +39,8 @@ public class Character
     // Статичний метод
     public static int GetCharacterCount()
     {
-        return characterCount;
+        return Volatile.Read(ref characterCount);
     }
+
+    public static Character CreateNew() => new($"Персонаж-{Guid.NewGuid():N}", Random.Shared.Next(50, 201));
 }
