@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Game;
 using Game.Infrastructure.Models;
 using Game.REST.Models;
@@ -20,6 +21,7 @@ public sealed class CharactersController(ICrudServiceAsync<CharacterModel> servi
         try { return Ok(Map(await service.ReadAsync(id))); }
         catch (KeyNotFoundException) { return NotFound(); }
     }
+    [Authorize(Roles = "Editor,Admin")]
     [HttpPost]
     public async Task<ActionResult<CharacterResponse>> Create(CharacterRequest request)
     {
@@ -27,6 +29,7 @@ public sealed class CharactersController(ICrudServiceAsync<CharacterModel> servi
         await service.CreateAsync(entity);
         return CreatedAtAction(nameof(Get), new { id = entity.Id }, Map(entity));
     }
+    [Authorize(Roles = "Editor,Admin")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, CharacterRequest request)
     {
@@ -35,6 +38,7 @@ public sealed class CharactersController(ICrudServiceAsync<CharacterModel> servi
         entity.Name = request.Name; entity.Health = request.Health;
         return await service.UpdateAsync(entity) ? NoContent() : NotFound();
     }
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -43,3 +47,4 @@ public sealed class CharactersController(ICrudServiceAsync<CharacterModel> servi
         return await service.RemoveAsync(entity) ? NoContent() : NotFound();
     }
 }
+
