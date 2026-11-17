@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Game.Console/Game.Console.csproj" />
   <Project Path="Game.Infrastructure/Game.Infrastructure.csproj" />
+  <Project Path="Game.REST/Game.REST.csproj" />
   <Project Path="Game/Game.csproj" />
 </Solution>

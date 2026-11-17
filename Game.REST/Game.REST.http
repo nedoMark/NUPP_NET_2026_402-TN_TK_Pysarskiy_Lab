@@ -1,0 +1,20 @@
+@Game.REST_HostAddress = http://localhost:5094
+
+GET {{Game.REST_HostAddress}}/api/characters?page=1&amount=20
+Accept: application/json
+
+###
+GET {{Game.REST_HostAddress}}/api/weapons?page=1&amount=20
+Accept: application/json
+
+###
+POST {{Game.REST_HostAddress}}/api/characters
+Content-Type: application/json
+
+{"name":"Hero","health":100}
+
+###
+POST {{Game.REST_HostAddress}}/api/weapons
+Content-Type: application/json
+
+{"name":"Sword","damage":40}
